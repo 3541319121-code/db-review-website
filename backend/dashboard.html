@@ -2,57 +2,47 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>学习中心 - NCRE数据库技术</title>
+		<link rel="stylesheet" href="../css/style.css">
 	</head>
 	<body>
-		<h1>
-		我的学习中心
-		</h1>
-		
-		
+		<h1>我的学习中心</h1>
+
+		<p><a href="../index.html">返回首页</a> | <a href="../exam.html">在线刷题</a></p>
+
 		<h2>
-		完成题目:
-		<span id="total">
-		0
-		</span>
+			完成题目:
+			<span id="total">0</span>
 		</h2>
-		
-		
+
 		<h2>
-		正确率:
-		<span id="rate">
-		0%
-		</span>
+			正确率:
+			<span id="rate">0%</span>
 		</h2>
-		
-		
+
+		<p id="tip" style="display:none;color:#666;">请先登录后再查看学习数据</p>
+
+		<script src="../js/config.js"></script>
+		<script src="../js/api.js"></script>
 		<script>
-		
-		
-		fetch(
-		
-		"http://localhost:3000/dashboard/"
-		+
-		localStorage.getItem("user_id")
-		
-		)
-		
-		.then(r=>r.json())
-		
-		.then(data=>{
-		
-		
-		total.innerHTML=
-		data.total;
-		
-		
-		rate.innerHTML=
-		data.rate+"%";
-		
-		
-		});
-		
-		
+			var userId = Auth.getUserId();
+
+			if (!userId) {
+				document.getElementById("tip").style.display = "block";
+			} else {
+				api
+					.getDashboard(userId)
+					.then(function (data) {
+						document.getElementById("total").textContent = data.total;
+						document.getElementById("rate").textContent = data.rate + "%";
+					})
+					.catch(function (err) {
+						document.getElementById("tip").textContent =
+							"加载失败：" + (err.message || "请确认后端已启动");
+						document.getElementById("tip").style.display = "block";
+					});
+			}
 		</script>
 	</body>
 </html>

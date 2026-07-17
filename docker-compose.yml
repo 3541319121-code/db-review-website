@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: ncre-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ncre_root_pass
+      MYSQL_DATABASE: ncre
+      MYSQL_USER: ncre_user
+      MYSQL_PASSWORD: ncre_pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ncre-backend
+    environment:
+      PORT: 3000
+      JWT_SECRET: ncre_jwt_secret_change_in_production
+      DB_HOST: db
+      DB_USER: ncre_user
+      DB_PASSWORD: ncre_pass
+      DB_NAME: ncre
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm start
+
+  frontend:
+    image: nginx:alpine
+    container_name: ncre-frontend
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+      - ./exam.html:/usr/share/nginx/html/exam.html
+      - ./css:/usr/share/nginx/html/css
+      - ./js:/usr/share/nginx/html/js
+      - ./img:/usr/share/nginx/html/img
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

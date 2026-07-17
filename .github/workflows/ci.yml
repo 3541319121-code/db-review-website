@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ncre_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ./backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint check
+        run: echo "Lint check placeholder"
+
+      - name: Initialize test database
+        run: |
+          mysql -h 127.0.0.1 -u root -proot ncre_test < ../database/schema.sql
+
+      - name: Start server and test health
+        run: |
+          cp .env.example .env 2>/dev/null || true
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
+          echo "DB_NAME=ncre_test" >> .env
+          echo "JWT_SECRET=test_secret" >> .env
+          npm start &
+          sleep 5
+          curl -f http://localhost:3000/health || exit 1
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check frontend files exist
+        run: |
+          test -f index.html
+          test -f exam.html
+          test -f css/style.css
+          test -f js/app.js
+          test -f js/api.js
+          test -f js/config.js
+          test -f js/exam.js

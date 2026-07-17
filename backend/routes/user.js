@@ -1,171 +1,69 @@
-const express=require("express");
+const express = require("express");
+const router = express.Router();
+const db = require("../database");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 
-const router=express.Router();
+router.post("/register", async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
 
-const db=require("../database");
+    if (!username || !password) {
+      return res.status(400).json({ msg: "用户名和密码不能为空" });
+    }
 
-const bcrypt=require("bcrypt");
+    const hash = await bcrypt.hash(password, 10);
 
-const jwt=require("jsonwebtoken");
+    await db
+      .promise()
+      .query("INSERT INTO users (username, password) VALUES (?, ?)", [
+        username,
+        hash,
+      ]);
 
-
-
-const SECRET="NCRE_SECRET_KEY";
-
-
-
-//注册
-
-router.post("/register",async(req,res)=>{
-
-
-let {
-username,
-password
-}=req.body;
-
-
-
-let hash=
-await bcrypt.hash(password,10);
-
-
-
-db.query(
-
-"INSERT INTO users(username,password) VALUES(?,?)",
-
-[
-username,
-hash
-],
-
-(err,result)=>{
-
-
-if(err){
-
-return res.json({
-msg:"用户名已存在"
+    res.json({ msg: "注册成功" });
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.json({ msg: "用户名已存在" });
+    }
+    next(err);
+  }
 });
 
-}
+router.post("/login", async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
 
+    if (!username || !password) {
+      return res.status(400).json({ msg: "用户名和密码不能为空" });
+    }
 
+    const [rows] = await db
+      .promise()
+      .query("SELECT * FROM users WHERE username = ?", [username]);
 
-res.json({
+    if (!rows.length) {
+      return res.json({ msg: "用户不存在" });
+    }
 
-msg:"注册成功"
+    const user = rows[0];
+    const ok = await bcrypt.compare(password, user.password);
 
+    if (!ok) {
+      return res.json({ msg: "密码错误" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      config.jwtSecret,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ msg: "登录成功", token, id: user.id });
+  } catch (err) {
+    next(err);
+  }
 });
 
-
-}
-
-);
-
-
-});
-
-
-
-
-
-//登录
-
-router.post("/login",(req,res)=>{
-
-
-let {
-username,
-password
-}=req.body;
-
-
-
-db.query(
-
-"SELECT * FROM users WHERE username=?",
-
-[username],
-
-async(err,result)=>{
-
-
-if(result.length===0){
-
-return res.json({
-
-msg:"用户不存在"
-
-});
-
-}
-
-
-
-let user=result[0];
-
-
-let ok=
-await bcrypt.compare(
-password,
-user.password
-);
-
-
-
-if(!ok){
-
-return res.json({
-
-msg:"密码错误"
-
-});
-
-}
-
-
-
-let token=
-jwt.sign(
-
-{
-id:user.id,
-username:user.username
-},
-
-SECRET,
-
-{
-expiresIn:"7d"
-}
-
-);
-
-
-
-res.json({
-
-msg:"登录成功",
-
-token,
-
-id:user.id
-
-});
-
-
-
-}
-
-);
-
-
-
-});
-
-
-
-
-module.exports=router;
+module.exports = router;

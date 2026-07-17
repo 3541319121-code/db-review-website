@@ -1,77 +1,30 @@
-const express=require("express");
+const express = require("express");
+const cors = require("cors");
+const config = require("./config");
+const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
-const cors=require("cors");
-
-
-const app=express();
-
+const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
-
-//测试接口
-
-app.get("/",(req,res)=>{
-
-res.send(
-"NCRE数据库学习系统API运行成功"
-);
-
+app.get("/", (req, res) => {
+  res.send("NCRE数据库学习系统API运行成功");
 });
 
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
 
-//题库接口
+app.use("/questions", require("./routes/question"));
+app.use("/user", require("./routes/user"));
+app.use("/record", require("./routes/record"));
+app.use("/wrong", require("./routes/wrong"));
+app.use("/dashboard", require("./routes/dashboard"));
 
-const question=require("./routes/question");
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-
-app.use(
-"/questions",
-question
-);
-
-const user=require("./routes/user");
-
-
-app.use(
-"/user",
-user
-);
-
-const record=require("./routes/record");
-
-
-app.use(
-"/record",
-record
-);
-
-
-const wrong=require("./routes/wrong");
-
-
-app.use(
-"/wrong",
-wrong
-);
-
-
-const dashboard=require("./routes/dashboard");
-
-
-app.use(
-"/dashboard",
-dashboard
-);
-
-app.listen(3000,()=>{
-
-
-console.log(
-"服务器启动：http://localhost:3000"
-);
-
-
+app.listen(config.port, () => {
+  console.log(`服务器启动：http://localhost:${config.port}`);
 });
