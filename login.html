@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 / 注册 - NCRE数据库技术</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .login-split {
+      display: flex;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+    .login-left {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary), #5c9cf5);
+      color: var(--on-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px;
+    }
+    .login-left h1 {
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    .login-left p {
+      font-size: 16px;
+      opacity: 0.9;
+      margin: 0;
+    }
+    .login-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--canvas-soft);
+      padding: 48px;
+    }
+    @media (max-width: 768px) {
+      .login-left { display: none; }
+      .login-right { padding: 24px; }
+    }
+  </style>
+</head>
+<body style="padding-top:0;">
+
+<div class="login-split">
+  <div class="login-left">
+    <h1><i class="fa-solid fa-database"></i> NCRE数据库技术</h1>
+    <p>全国计算机等级考试三级数据库技术复习平台<br>登录后即可同步学习记录与错题本</p>
+  </div>
+  <div class="login-right">
+    <div class="login-card">
+      <h2>欢迎</h2>
+      <p>登录或注册以同步你的学习数据</p>
+
+      <div class="form-group">
+        <label class="form-label">用户名</label>
+        <input type="text" id="username" class="form-input" placeholder="请输入用户名">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input type="password" id="password" class="form-input" placeholder="请输入密码">
+      </div>
+
+      <div id="authTip" class="alert alert-error" style="display:none;margin-bottom:16px;"></div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="register()">注册</button>
+        <button class="btn btn-primary" onclick="login()">登录</button>
+      </div>
+
+      <div class="text-center mt-2">
+        <a href="index.html" style="font-size:13px;"><i class="fa-solid fa-arrow-left"></i> 返回首页</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+function showAuthTip(msg) {
+  var tip = document.getElementById("authTip");
+  if (tip) { tip.textContent = msg; tip.style.display = "block"; }
+}
+function hideAuthTip() {
+  var tip = document.getElementById("authTip");
+  if (tip) { tip.style.display = "none"; }
+}
+function register() {
+  hideAuthTip();
+  api.register(username.value, password.value)
+    .then(function (data) {
+      if (data.msg && data.msg.indexOf("成功") !== -1) {
+        showAuthTip(data.msg + "，请登录");
+      } else {
+        showAuthTip(data.msg || "注册失败");
+      }
+    })
+    .catch(function (err) { showAuthTip(err.message || "注册失败"); });
+}
+function login() {
+  hideAuthTip();
+  api.login(username.value, password.value)
+    .then(function (data) {
+      if (data.token) {
+        Auth.setSession(data.token, data.id);
+        window.location.href = "index.html";
+      } else {
+        showAuthTip(data.msg || "登录失败");
+      }
+    })
+    .catch(function (err) { showAuthTip(err.message || "登录失败"); });
+}
+</script>
+
+</body>
+</html>

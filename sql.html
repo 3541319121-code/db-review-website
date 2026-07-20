@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>模拟考试 - NCRE数据库技术</title>
+  <title>SQL训练 - NCRE数据库技术</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,8 +18,8 @@
   <div class="nav-links">
     <a href="index.html">首页</a>
     <a href="outline.html">考试大纲</a>
-    <a href="sql.html">SQL训练</a>
-    <a href="exam.html" class="active">模拟考试</a>
+    <a href="sql.html" class="active">SQL训练</a>
+    <a href="exam.html">模拟考试</a>
     <a href="practice.html">在线刷题</a>
     <a href="wrong.html">错题本</a>
   </div>
@@ -35,8 +35,8 @@
       <div class="section-title">学习内容</div>
       <a href="index.html"><i class="fa-solid fa-house"></i> 首页</a>
       <a href="outline.html"><i class="fa-solid fa-book-open"></i> 考试大纲</a>
-      <a href="sql.html"><i class="fa-solid fa-code"></i> SQL训练</a>
-      <a href="exam.html" class="active"><i class="fa-solid fa-clock"></i> 模拟考试</a>
+      <a href="sql.html" class="active"><i class="fa-solid fa-code"></i> SQL训练</a>
+      <a href="exam.html"><i class="fa-solid fa-clock"></i> 模拟考试</a>
       <a href="practice.html"><i class="fa-solid fa-pen-to-square"></i> 在线刷题</a>
       <a href="wrong.html"><i class="fa-solid fa-circle-xmark"></i> 错题本</a>
     </div>
@@ -44,22 +44,28 @@
 
   <main class="main-content">
     <div class="page-header">
-      <h1>模拟考试系统</h1>
-      <p>限时60分钟，全真模拟NCRE三级数据库技术考试环境</p>
+      <h1>SQL专项训练</h1>
+      <p>手写SQL语句，查看标准答案，加入错题本</p>
     </div>
 
     <div class="card">
       <div class="flex items-center justify-between mb-2">
-        <div>
-          <span class="text-muted">剩余时间：</span>
-          <span class="exam-timer" id="timer">60:00</span>
-        </div>
-        <button class="btn btn-primary" id="startBtn" onclick="startExam()"><i class="fa-solid fa-play"></i> 开始考试</button>
+        <div class="tag" id="sqlTag">基础查询</div>
+        <div class="text-muted">题号：<span id="sqlIndex">1/10</span></div>
       </div>
 
-      <div id="examArea"></div>
+      <h3 class="card-title" id="sqlQuestion">查询student表所有数据</h3>
 
-      <div id="examResult" class="alert alert-info mt-2" style="display:none"></div>
+      <label class="form-label">你的答案</label>
+      <textarea id="sqlInput" class="sql-textarea" rows="4" placeholder="在此输入SQL语句..."></textarea>
+
+      <div class="flex gap-2 mt-2">
+        <button class="btn btn-primary" onclick="showSQLAnswer()"><i class="fa-solid fa-eye"></i> 查看答案</button>
+        <button class="btn btn-secondary" onclick="nextSQL()"><i class="fa-solid fa-arrow-right"></i> 下一题</button>
+        <button class="btn btn-secondary" onclick="addWrong()"><i class="fa-solid fa-plus"></i> 加入错题本</button>
+      </div>
+
+      <div id="sqlAnswer" class="alert alert-success mt-2" style="display:none"></div>
     </div>
 
     <div class="page-footer">
@@ -72,7 +78,7 @@
 
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
-<script src="js/exam-page.js"></script>
+<script src="js/sql.js"></script>
 
 </body>
 </html>

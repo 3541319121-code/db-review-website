@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>模拟考试 - NCRE数据库技术</title>
+  <title>考试大纲 - NCRE数据库技术</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,9 +17,9 @@
   </a>
   <div class="nav-links">
     <a href="index.html">首页</a>
-    <a href="outline.html">考试大纲</a>
+    <a href="outline.html" class="active">考试大纲</a>
     <a href="sql.html">SQL训练</a>
-    <a href="exam.html" class="active">模拟考试</a>
+    <a href="exam.html">模拟考试</a>
     <a href="practice.html">在线刷题</a>
     <a href="wrong.html">错题本</a>
   </div>
@@ -30,13 +30,14 @@
 </nav>
 
 <div class="page-wrap">
+  <!-- 侧边栏 -->
   <aside class="sidebar">
     <div class="sidebar-nav">
       <div class="section-title">学习内容</div>
       <a href="index.html"><i class="fa-solid fa-house"></i> 首页</a>
-      <a href="outline.html"><i class="fa-solid fa-book-open"></i> 考试大纲</a>
+      <a href="outline.html" class="active"><i class="fa-solid fa-book-open"></i> 考试大纲</a>
       <a href="sql.html"><i class="fa-solid fa-code"></i> SQL训练</a>
-      <a href="exam.html" class="active"><i class="fa-solid fa-clock"></i> 模拟考试</a>
+      <a href="exam.html"><i class="fa-solid fa-clock"></i> 模拟考试</a>
       <a href="practice.html"><i class="fa-solid fa-pen-to-square"></i> 在线刷题</a>
       <a href="wrong.html"><i class="fa-solid fa-circle-xmark"></i> 错题本</a>
     </div>
@@ -44,22 +45,29 @@
 
   <main class="main-content">
     <div class="page-header">
-      <h1>模拟考试系统</h1>
-      <p>限时60分钟，全真模拟NCRE三级数据库技术考试环境</p>
+      <h1>考试大纲</h1>
+      <p>六大核心模块，系统梳理NCRE三级数据库技术考点</p>
     </div>
 
-    <div class="card">
-      <div class="flex items-center justify-between mb-2">
-        <div>
-          <span class="text-muted">剩余时间：</span>
-          <span class="exam-timer" id="timer">60:00</span>
-        </div>
-        <button class="btn btn-primary" id="startBtn" onclick="startExam()"><i class="fa-solid fa-play"></i> 开始考试</button>
+    <div class="flex items-center justify-between mb-2 flex-wrap">
+      <div style="font-size:16px;color:var(--body);">点击模块展开查看详细知识点</div>
+      <div class="flex items-center" style="gap:8px;">
+        <input type="text" id="searchInput" class="form-input" placeholder="搜索知识点..." style="width:240px;">
+        <button class="btn btn-primary btn-sm" onclick="searchKnowledge()"><i class="fa-solid fa-search"></i> 搜索</button>
       </div>
+    </div>
 
-      <div id="examArea"></div>
+    <div class="accordion-list" id="outlineBox"></div>
 
-      <div id="examResult" class="alert alert-info mt-2" style="display:none"></div>
+    <div class="card mt-3">
+      <div class="card-title"><i class="fa-solid fa-lightbulb"></i> 知识点详解</div>
+      <div id="knowledgeDetail" class="text-muted">点击上方知识点查看详细解释</div>
+    </div>
+
+    <!-- 思维导图 -->
+    <h2 class="mt-3 mb-2" style="font-size:20px;font-weight:600;">知识点思维导图</h2>
+    <div class="mindmap-wrap" id="mindmap">
+      <div class="mind-node center">三级数据库技术</div>
     </div>
 
     <div class="page-footer">
@@ -72,7 +80,7 @@
 
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
-<script src="js/exam-page.js"></script>
+<script src="js/outline.js"></script>
 
 </body>
 </html>
